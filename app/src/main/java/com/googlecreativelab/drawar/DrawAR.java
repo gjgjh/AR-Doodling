@@ -37,7 +37,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -108,8 +110,8 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     private SeekBar mLineWidthBar;
     private SeekBar mLineDistanceScaleBar;
     private SeekBar mSmoothingBar;
-    private LinearLayout mLineColorView;
-
+    private RelativeLayout mLineColorView;
+    private ImageView mLineColorImage;
 
     private float mLineWidthMax = 0.33f;
     private float mDistanceScale = 0.0f;
@@ -152,6 +154,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mLineWidthBar = findViewById(R.id.lineWidth);
         mSmoothingBar = findViewById(R.id.smoothingSeekBar);
         mLineColorView=findViewById(R.id.lineColorView);
+        mLineColorImage=findViewById(R.id.lineColorImage);
 
         mLineDistanceScaleBar.setProgress(sharedPref.getInt("mLineDistanceScale", 1));
         mLineWidthBar.setProgress(sharedPref.getInt("mLineWidth", 10));
@@ -159,6 +162,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         int defaultColor=sharedPref.getInt("mLineColor",0xffffffff);
         Vector3f curColor = new Vector3f(Color.red(defaultColor)/255f,Color.green(defaultColor)/255f,Color.blue(defaultColor)/255f);
         AppSettings.setColor(curColor);
+        mLineColorImage.setColorFilter(defaultColor);
 
         mDistanceScale = LineUtils.map((float) mLineDistanceScaleBar.getProgress(), 0, 100, 1, 200, true);
         mLineWidthMax = LineUtils.map((float) mLineWidthBar.getProgress(), 0f, 100f, 0.1f, 5f, true);
@@ -228,6 +232,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
                                 AppSettings.setColor(curColor);
                                 mLineShaderRenderer.bNeedsUpdate.set(true);
                                 mSettingsUI.setVisibility(View.GONE);
+                                mLineColorImage.setColorFilter(selectedColor);
 
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putInt("mLineColor", selectedColor);
