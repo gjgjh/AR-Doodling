@@ -156,6 +156,9 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mLineDistanceScaleBar.setProgress(sharedPref.getInt("mLineDistanceScale", 1));
         mLineWidthBar.setProgress(sharedPref.getInt("mLineWidth", 10));
         mSmoothingBar.setProgress(sharedPref.getInt("mSmoothing", 50));
+        int defaultColor=sharedPref.getInt("mLineColor",0xffffffff);
+        Vector3f curColor = new Vector3f(Color.red(defaultColor)/255f,Color.green(defaultColor)/255f,Color.blue(defaultColor)/255f);
+        AppSettings.setColor(curColor);
 
         mDistanceScale = LineUtils.map((float) mLineDistanceScaleBar.getProgress(), 0, 100, 1, 200, true);
         mLineWidthMax = LineUtils.map((float) mLineWidthBar.getProgress(), 0f, 100f, 0.1f, 5f, true);
@@ -223,6 +226,12 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
                             public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                                 Vector3f curColor = new Vector3f(Color.red(selectedColor)/255f,Color.green(selectedColor)/255f,Color.blue(selectedColor)/255f);
                                 AppSettings.setColor(curColor);
+                                mLineShaderRenderer.bNeedsUpdate.set(true);
+                                mSettingsUI.setVisibility(View.GONE);
+
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putInt("mLineColor", selectedColor);
+                                editor.apply();
                             }
                         })
                         .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -234,6 +243,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
                         .setColorEditTextColor(ContextCompat.getColor(DrawAR.this, android.R.color.holo_blue_bright))
                         .build()
                         .show();
+
             }
         });
 
@@ -265,8 +275,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mDetector = new GestureDetectorCompat(this, this);
         mDetector.setOnDoubleTapListener(this);
         mStrokes = new ArrayList<>();
-
-
     }
 
 
@@ -434,7 +442,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         }
     }
 
-
     /**
      * Create renderers after the Surface is Created and on the GL Thread
      */
@@ -564,16 +571,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
             mLineShaderRenderer.setDrawDebug(bLineParameters.get());
 
             // 更新
-            if (mLineShaderRenderer.bNeedsUpdate.get()&&mStrokes.size()<=2) {
-                mLineShaderRenderer.setColor(AppSettings.getColor());
-                mLineShaderRenderer.mDrawDistance = AppSettings.getStrokeDrawDistance();
-                mLineShaderRenderer.setDistanceScale(mDistanceScale);
-                mLineShaderRenderer.setLineWidth(mLineWidthMax);
-                mLineShaderRenderer.clear();
-                mLineShaderRenderer.updateStrokes(mStrokes);
-                mLineShaderRenderer.upload();
-            }
-
             if (mLineShaderRenderer.bNeedsUpdate.get()) {
                 mLineShaderRenderer.setColor(AppSettings.getColor());
                 mLineShaderRenderer.mDrawDistance = AppSettings.getStrokeDrawDistance();

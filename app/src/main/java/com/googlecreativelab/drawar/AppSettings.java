@@ -18,7 +18,7 @@
 import javax.vecmath.Vector3f;
 
 public class AppSettings {
-    private static Vector3f color = new Vector3f(0f, 1f, 0f);
+    private static Vector3f color = new Vector3f(1f, 1f, 1f);
     private static final float strokeDrawDistance = 0.125f;
     private static final float minDistance = 0.000625f;
     private static final float nearClip = 0.001f;
