@@ -83,7 +83,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
 
     private GLSurfaceView mSurfaceView;
 
-    private Config mDefaultConfig;
     private Session mSession;
     private BackgroundRenderer mBackgroundRenderer = new BackgroundRenderer();
     private LineShaderRenderer mLineShaderRenderer = new LineShaderRenderer();
@@ -156,6 +155,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mLineColorView=findViewById(R.id.lineColorView);
         mLineColorImage=findViewById(R.id.lineColorImage);
 
+        // 读取上一次设置
         mLineDistanceScaleBar.setProgress(sharedPref.getInt("mLineDistanceScale", 1));
         mLineWidthBar.setProgress(sharedPref.getInt("mLineWidth", 10));
         mSmoothingBar.setProgress(sharedPref.getInt("mSmoothing", 50));
@@ -201,6 +201,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
             }
         };
 
+        // 设置事件监听
         mLineDistanceScaleBar.setOnSeekBarChangeListener(seekBarChangeListener);
         mLineWidthBar.setOnSeekBarChangeListener(seekBarChangeListener);
         mSmoothingBar.setOnSeekBarChangeListener(seekBarChangeListener);
@@ -264,12 +265,14 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         bInstallRequested = false;
 
         // Set up renderer.
-        /*配置GLSurfaceView
-        在pause状态下，保留EGL上下文
-        OpenGL ES 版本选择 2.0 版本
-        绘制表面选择RGBA分别为8位，深度16位，模板0位的配置
-        设置自身为渲染器，即处理逻辑在这个类里实现
-        渲染模式设为持续渲染，即一帧渲染完，马上开始下一帧的渲染*/
+        /*
+        配置GLSurfaceView:
+        1 在pause状态下，保留EGL上下文
+        2 OpenGL ES 版本选择 2.0 版本
+        3 绘制表面选择RGBA分别为8位，深度16位，模板0位的配置
+        4 设置自身为渲染器，即处理逻辑在这个类里实现
+        4 渲染模式设为持续渲染，即一帧渲染完，马上开始下一帧的渲染
+        */
         mSurfaceView.setPreserveEGLContextOnPause(true);
         mSurfaceView.setEGLContextClientVersion(2);
         mSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0); // Alpha used for plane blending.
@@ -279,6 +282,8 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         // Setup touch detector
         mDetector = new GestureDetectorCompat(this, this);
         mDetector.setOnDoubleTapListener(this);
+
+        // 线条集合初始化为空
         mStrokes = new ArrayList<>();
     }
 
@@ -414,7 +419,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
 
         mPaused = false;
 
-
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         mScreenHeight = displayMetrics.heightPixels;
@@ -450,7 +454,7 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     /**
      * Create renderers after the Surface is Created and on the GL Thread
      */
-    // 要实现在GLSurfaceView上绘制内容，需要实现GLSurfaceView.Renderer接口: onSurfaceCreated, onSurfaceChanged andonDrawFrame
+    // 要实现在GLSurfaceView上绘制内容，需要实现GLSurfaceView.Renderer三个接口: onSurfaceCreated, onSurfaceChanged andonDrawFrame
     // 在可绘制表面创建或重新创建的时候被调用
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -590,8 +594,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
             e.printStackTrace();
         }
     }
-
-
 
 
     /**

@@ -168,7 +168,7 @@ public class LineShaderRenderer {
          *
          */
         // 该renderer类把所有的线段都封装在了一个vertex buffer object (VBO)中，只用调用一次draw即可渲染全部的线
-        // 这显然也导致了原app没法同时绘制多个颜色线段
+        // 这显然也导致了原app没法同时绘制多个颜色线条
         int vertexShader = ShaderUtil.loadGLShader(TAG, context,
                 GLES20.GL_VERTEX_SHADER, R.raw.line_vert);
         int fragmentShader = ShaderUtil.loadGLShader(TAG, context,
@@ -312,11 +312,7 @@ public class LineShaderRenderer {
         if (line == null || line.size() < 2)
             return offset;
 
-
-
-
         int lineSize = line.size();
-
 
         int ii = offset;
         for (int i = 0; i < lineSize; i++) {
@@ -329,12 +325,9 @@ public class LineShaderRenderer {
             int i_p_1 = (iGood + 1) > (lineSize - 1) ? iGood : iGood + 1;
             float c = ((float) i / lineSize);
 
-
             Vector3f current = line.get(iGood);
             Vector3f previous = line.get(i_m_1);
             Vector3f next = line.get(i_p_1);
-
-
 
             if (i == 0) {
                 setMemory(ii++, current, previous, next, c, lineWidth, 1f);
@@ -456,7 +449,7 @@ public class LineShaderRenderer {
      * @param nearClip
      * @param farClip
      */
-    // 默认重新绘制所有线段
+    // 重新绘制所有线段
     public void draw(float[] cameraView, float[] cameraPerspective, float screenWidth, float screenHeight, float nearClip, float farClip) {
 
 
